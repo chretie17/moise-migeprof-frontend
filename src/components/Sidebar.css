@@ -1,0 +1,14 @@
+.sidebar {
+    width: 240px;
+    height: 100%;
+    position: fixed;
+    background-color: #f8f9fa;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+  
+  .main-content {
+    margin-left: 240px; /* Adjust this if your sidebar width changes */
+    padding: 24px;
+  }
+  
