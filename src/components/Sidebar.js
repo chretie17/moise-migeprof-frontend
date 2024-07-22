@@ -37,6 +37,8 @@ const Sidebar = () => {
     { text: 'Register Families', path: '/register-families', icon: <PeopleIcon /> },
     { text: 'Track Attendance', path: '/track-attendance', icon: <TrackChangesIcon /> },
     { text: 'Submit Reports', path: '/submit-reports', icon: <AssignmentIcon /> },
+    { text: 'Submit Field Feedback', path: '/submit-feedback', icon: <AssignmentIcon /> },
+
   ];
 
   const links = role === 'admin' ? adminLinks : fieldAgentLinks;

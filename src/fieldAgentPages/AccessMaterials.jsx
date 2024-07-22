@@ -7,15 +7,17 @@ import {
   CardContent,
   CardMedia,
   CardActionArea,
-  IconButton,
   Snackbar,
   Alert,
 } from '@mui/material';
 import { getAllContents } from '../services/ContentService';
+import { submitFeedback, getAllFeedback } from '../services/feedbackservice';
 import ReactPlayer from 'react-player';
+import Rating from 'react-rating-stars-component';
 
 const AccessMaterials = () => {
   const [contents, setContents] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
   const [notification, setNotification] = useState({
     open: false,
     message: '',
@@ -24,6 +26,7 @@ const AccessMaterials = () => {
 
   useEffect(() => {
     fetchContents();
+    fetchFeedbacks();
   }, []);
 
   const fetchContents = async () => {
@@ -40,12 +43,67 @@ const AccessMaterials = () => {
     }
   };
 
+  const fetchFeedbacks = async () => {
+    try {
+      const feedbacks = await getAllFeedback();
+      setFeedbacks(feedbacks);
+    } catch (error) {
+      console.error('Error fetching feedbacks', error);
+      setNotification({
+        open: true,
+        message: 'Error fetching feedbacks',
+        severity: 'error',
+      });
+    }
+  };
+
+  const handleRatingChange = async (newRating, contentId) => {
+    try {
+      const feedbackData = {
+        ContentID: contentId,
+        Rating: newRating,
+        FamilyID: 2, // Use appropriate FamilyID or retrieve it from context/state
+      };
+
+      const existingFeedback = feedbacks.find(
+        (feedback) => feedback.ContentID === contentId && feedback.FamilyID === 2
+      );
+
+      if (existingFeedback) {
+        feedbackData.FeedbackID = existingFeedback.FeedbackID;
+      }
+
+      await submitFeedback(feedbackData);
+      fetchFeedbacks(); // Refresh feedback data
+
+      setNotification({
+        open: true,
+        message: 'Feedback submitted successfully',
+        severity: 'success',
+      });
+    } catch (error) {
+      console.error('Error submitting feedback', error);
+      setNotification({
+        open: true,
+        message: 'Error submitting feedback',
+        severity: 'error',
+      });
+    }
+  };
+
   const handleCloseNotification = () => {
     setNotification({
       open: false,
       message: '',
       severity: 'success',
     });
+  };
+
+  const getContentRating = (contentId) => {
+    const feedback = feedbacks.find(
+      (feedback) => feedback.ContentID === contentId && feedback.FamilyID === 2
+    );
+    return feedback ? feedback.Rating : 0;
   };
 
   return (
@@ -75,6 +133,12 @@ const AccessMaterials = () => {
                   <Typography variant="body2" color="text.secondary">
                     {content.Description}
                   </Typography>
+                  <Rating
+                    count={10}
+                    size={30}
+                    value={getContentRating(content.ContentID)}
+                    onChange={(newRating) => handleRatingChange(newRating, content.ContentID)}
+                  />
                 </CardContent>
               </CardActionArea>
             </Card>

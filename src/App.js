@@ -10,127 +10,139 @@ import ManageRegistrations from './adminPages/ManageRegistrations';
 import ViewReports from './adminPages/ViewReports';
 import AccessMaterials from './fieldAgentPages/AccessMaterials';
 import RegisterFamilies from './fieldAgentPages/RegisterFamilies';
+import SubmitFeedback from './fieldAgentPages/Feedback';
 import TrackAttendance from './fieldAgentPages/TrackAttendance';
 import SubmitReports from './fieldAgentPages/SubmitReports';
 import PrivateRoute from './components/Auth/PrivateRoute';
 import Sidebar from './components/Sidebar';
 import './index.css'; // Import the CSS file here
+import { UserProvider } from './context/UserContext';
 
 const App = () => {
   const role = localStorage.getItem('role');
 
   return (
-    <Router>
-      <div id="root">
-        {role && <Sidebar />}
-        <div className="main-content">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Navigate to="/login" />} />
-            
-            {/* Admin Routes */}
-            <Route 
-              path="/dashboard/admin" 
-              element={
-                <PrivateRoute>
-                  <AdminDashboard />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/manage-field-agents" 
-              element={
-                <PrivateRoute>
-                  <ManageFieldAgents />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/track-activities" 
-              element={
-                <PrivateRoute>
-                  <TrackActivities />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/update-content" 
-              element={
-                <PrivateRoute>
-                  <UpdateContent />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/manage-registrations" 
-              element={
-                <PrivateRoute>
-                  <ManageRegistrations />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/view-reports" 
-              element={
-                <PrivateRoute>
-                  <ViewReports />
-                </PrivateRoute>
-              } 
-            />
-            
-            {/* Field Agent Routes */}
-            <Route 
-              path="/dashboard/field-agent" 
-              element={
-                <PrivateRoute>
-                  <FieldAgentDashboard />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/access-materials" 
-              element={
-                <PrivateRoute>
-                  <AccessMaterials />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/register-families" 
-              element={
-                <PrivateRoute>
-                  <RegisterFamilies />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/track-attendance" 
-              element={
-                <PrivateRoute>
-                  <TrackAttendance />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/submit-reports" 
-              element={
-                <PrivateRoute>
-                  <SubmitReports />
-                </PrivateRoute>
-              } 
-            />
-            
-            {/* Redirect to the appropriate dashboard based on role */}
-            <Route 
-              path="*" 
-              element={
-                <Navigate to={role === 'admin' ? "/dashboard/admin" : "/dashboard/field-agent"} />
-              } 
-            />
-          </Routes>
+    <UserProvider>
+      <Router>
+        <div id="root">
+          {role && <Sidebar />}
+          <div className="main-content">
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<Navigate to="/login" />} />
+              
+              {/* Admin Routes */}
+              <Route 
+                path="/dashboard/admin" 
+                element={
+                  <PrivateRoute>
+                    <AdminDashboard />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/manage-field-agents" 
+                element={
+                  <PrivateRoute>
+                    <ManageFieldAgents />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/track-activities" 
+                element={
+                  <PrivateRoute>
+                    <TrackActivities />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/update-content" 
+                element={
+                  <PrivateRoute>
+                    <UpdateContent />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/manage-registrations" 
+                element={
+                  <PrivateRoute>
+                    <ManageRegistrations />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/view-reports" 
+                element={
+                  <PrivateRoute>
+                    <ViewReports />
+                  </PrivateRoute>
+                } 
+              />
+              
+              {/* Field Agent Routes */}
+              <Route 
+                path="/dashboard/field-agent" 
+                element={
+                  <PrivateRoute>
+                    <FieldAgentDashboard />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/access-materials" 
+                element={
+                  <PrivateRoute>
+                    <AccessMaterials />
+                  </PrivateRoute>
+                } 
+              />
+               <Route 
+                path="/submit-feedback" 
+                element={
+                  <PrivateRoute>
+                    <SubmitFeedback />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/register-families" 
+                element={
+                  <PrivateRoute>
+                    <RegisterFamilies />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/track-attendance" 
+                element={
+                  <PrivateRoute>
+                    <TrackAttendance />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/submit-reports" 
+                element={
+                  <PrivateRoute>
+                    <SubmitReports />
+                  </PrivateRoute>
+                } 
+              />
+              
+              {/* Redirect to the appropriate dashboard based on role */}
+              <Route 
+                path="*" 
+                element={
+                  <Navigate to={role === 'admin' ? "/dashboard/admin" : "/dashboard/field-agent"} />
+                } 
+              />
+            </Routes>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </UserProvider>
   );
 };
 

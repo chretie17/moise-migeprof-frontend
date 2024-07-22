@@ -17,7 +17,9 @@ const theme = createTheme({
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [newPassword, setNewPassword] = useState(''); // Define newPassword
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isFirstLogin, setIsFirstLogin] = useState(false);
   const [userId, setUserId] = useState(null);
@@ -44,8 +46,12 @@ const Login = () => {
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setError('New passwords do not match');
+      return;
+    }
     try {
-      await resetPassword(userId, newPassword); // Use newPassword
+      await resetPassword(userId, oldPassword, newPassword); // Include oldPassword
       setIsFirstLogin(false);
       setError('');
       window.location.href = '/login';
@@ -83,18 +89,60 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isFirstLogin}
               />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name={isFirstLogin ? "newPassword" : "password"} // Adjust this line
-                label={isFirstLogin ? "New Password" : "Password"} // Adjust this line
-                type="password"
-                id={isFirstLogin ? "newPassword" : "password"} // Adjust this line
-                autoComplete={isFirstLogin ? "new-password" : "current-password"} // Adjust this line
-                value={isFirstLogin ? newPassword : password} // Adjust this line
-                onChange={(e) => isFirstLogin ? setNewPassword(e.target.value) : setPassword(e.target.value)} // Adjust this line
-              />
+              {isFirstLogin && (
+                <>
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="oldPassword"
+                    label="Old Password"
+                    type="password"
+                    id="oldPassword"
+                    autoComplete="current-password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                  />
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="newPassword"
+                    label="New Password"
+                    type="password"
+                    id="newPassword"
+                    autoComplete="new-password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                  <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="confirmPassword"
+                    label="Confirm New Password"
+                    type="password"
+                    id="confirmPassword"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </>
+              )}
+              {!isFirstLogin && (
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              )}
               {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
               <Button
                 type="submit"

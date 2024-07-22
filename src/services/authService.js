@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api', // Directly specify the API base URL here
+  baseURL: 'http://localhost:3000/api', // Ensure this matches your server base URL
 });
 
 api.interceptors.request.use((config) => {
@@ -21,8 +21,12 @@ export const login = async (email, password) => {
   return response.data;
 };
 
-export const resetPassword = async (userId, newPassword) => {
-  const response = await api.post('/users/reset-password', { UserID: userId, newPassword });
+export const resetPassword = async (userId, oldPassword, newPassword) => {
+  const response = await api.post('/users/reset-password', {
+    UserID: userId,
+    oldPassword: oldPassword,
+    newPassword: newPassword
+  });
   return response.data;
 };
 
