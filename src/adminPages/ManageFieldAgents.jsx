@@ -34,7 +34,7 @@ const ManageFieldAgents = () => {
   const [newUser, setNewUser] = useState({
     username: '',
     email: '',
-    password: 'password', // Default password
+    password: '',
     role: 'field-agent',
   });
   const [notification, setNotification] = useState({
@@ -149,7 +149,7 @@ const ManageFieldAgents = () => {
     setNewUser({
       username: '',
       email: '',
-      password: 'password', // Reset to default password
+      password: '',
       role: 'field-agent',
     });
   };
@@ -200,6 +200,17 @@ const ManageFieldAgents = () => {
                 type="email"
                 fullWidth
                 value={newUser.email}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="password"
+                label="Password"
+                type="password"
+                fullWidth
+                value={newUser.password}
                 onChange={handleInputChange}
               />
             </Grid>

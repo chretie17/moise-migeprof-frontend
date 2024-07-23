@@ -1,0 +1,24 @@
+/* Login.css */
+.login-container {
+    background-color: #ffffff; /* White background for login */
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .login-paper {
+    padding: 2rem;
+    border-radius: 1rem;
+  }
+  
+  .login-image {
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  .main-content {
+    margin-left: 0; /* No sidebar margin */
+    padding-top: 0; /* No navbar padding */
+  }
+  

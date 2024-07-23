@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { getAllPrograms, createProgram, updateProgram, deleteProgram, toggleProgramStatus } from '../services/ProgramService';
 import {
   Box,
   Button,
@@ -25,12 +24,16 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import GroupIcon from '@mui/icons-material/Group';
+import { getAllPrograms, createProgram, updateProgram, deleteProgram, toggleProgramStatus } from '../services/ProgramService';
+import ManageFamilies from './ManageFamilies';
 
 const ManagePrograms = () => {
   const [programs, setPrograms] = useState([]);
   const [open, setOpen] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+  const [viewFamiliesOpen, setViewFamiliesOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [editMode, setEditMode] = useState(false);
   const [newProgram, setNewProgram] = useState({
     ProgramName: '',
     Description: '',
@@ -171,6 +174,16 @@ const ManagePrograms = () => {
     });
   };
 
+  const handleViewFamilies = (program) => {
+    setSelectedProgram(program);
+    setViewFamiliesOpen(true);
+  };
+
+  const handleCloseViewFamilies = () => {
+    setViewFamiliesOpen(false);
+    setSelectedProgram(null);
+  };
+
   return (
     <Box sx={{ padding: 3 }}>
       <Typography variant="h4" gutterBottom>
@@ -275,12 +288,28 @@ const ManagePrograms = () => {
                   <IconButton color="secondary" onClick={() => handleDeleteProgram(program.ProgramID)}>
                     <DeleteIcon />
                   </IconButton>
+                  <IconButton color="primary" onClick={() => handleViewFamilies(program)}>
+                    <GroupIcon />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Dialog open={viewFamiliesOpen} onClose={handleCloseViewFamilies} maxWidth="md" fullWidth>
+        <DialogTitle>Families in Program</DialogTitle>
+        <DialogContent>
+          {selectedProgram && <ManageFamilies programId={selectedProgram.ProgramID} onClose={handleCloseViewFamilies} />}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseViewFamilies} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Snackbar
         open={notification.open}
         autoHideDuration={6000}

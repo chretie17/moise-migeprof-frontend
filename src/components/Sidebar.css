@@ -1,14 +1,86 @@
+/* Sidebar styles */
 .sidebar {
-    width: 240px;
-    height: 100%;
-    position: fixed;
-    background-color: #f8f9fa;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+  width: 240px;
+  flex-shrink: 0;
+  position: fixed;
+  height: 100%;
+  z-index: 1200;
+  top: 0;
+  left: 0;
+  background-color: #fff;
+}
+
+.sidebar .MuiDrawer-paper {
+  width: 240px;
+  box-sizing: border-box;
+}
+
+.sidebar .MuiListItemIcon-root {
+  min-width: 40px;
+}
+
+/* Navbar styles */
+.navbar {
+  position: fixed;
+  width: calc(100% - 240px); /* Full width minus sidebar width */
+  margin-left: 240px; /* Push to the right of the sidebar */
+  z-index: 1300; /* Ensure it is above the sidebar */
+  background-color: #3f51b5;
+}
+
+.navbar .MuiToolbar-root {
+  display: flex;
+  justify-content: space-between;
+}
+
+.navbar .search {
+  position: relative;
+  border-radius: 4px;
+  background-color: #fff;
+  margin-left: 8px;
+  width: auto;
+}
+
+.navbar .search:hover {
+  background-color: #f2f2f2;
+}
+
+.navbar .searchIconWrapper {
+  padding: 0 16px;
+  height: 100%;
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar .styledInputBase {
+  color: inherit;
+  width: 100%;
+  padding: 8px 8px 8px 0;
+  padding-left: calc(1em + 32px);
+  transition: width 300ms;
+}
+
+.navbar .styledInputBase .MuiInputBase-input {
+  width: 20ch;
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    width: 100%;
+    margin-left: 0;
   }
-  
-  .main-content {
-    margin-left: 240px; /* Adjust this if your sidebar width changes */
-    padding: 24px;
+  .navbar .styledInputBase .MuiInputBase-input {
+    width: 100%;
   }
-  
+}
+
+.main-content {
+  margin-left: 240px; /* Push content to the right of the sidebar */
+  margin-top: 64px; /* Push content below the navbar */
+  padding: 16px;
+  background-color: #f9f9f9;
+  min-height: 100vh; /* Ensure it takes the full height of the viewport */
+}
