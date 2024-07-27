@@ -26,10 +26,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import GroupIcon from '@mui/icons-material/Group';
 import { getAllPrograms, createProgram, updateProgram, deleteProgram, toggleProgramStatus } from '../services/ProgramService';
-import ManageFamilies from './ManageFamilies';
+import { getFamilies } from '../services/Familyservice'; // Adjust the import based on your actual service structure
 
 const ManagePrograms = () => {
   const [programs, setPrograms] = useState([]);
+  const [families, setFamilies] = useState([]);
   const [open, setOpen] = useState(false);
   const [viewFamiliesOpen, setViewFamiliesOpen] = useState(false);
   const [selectedProgram, setSelectedProgram] = useState(null);
@@ -47,6 +48,7 @@ const ManagePrograms = () => {
 
   useEffect(() => {
     fetchPrograms();
+    fetchAllFamilies();
   }, []);
 
   const fetchPrograms = async () => {
@@ -55,6 +57,15 @@ const ManagePrograms = () => {
       setPrograms(programs);
     } catch (error) {
       console.error('Error fetching programs', error);
+    }
+  };
+
+  const fetchAllFamilies = async () => {
+    try {
+      const families = await getFamilies();
+      setFamilies(families);
+    } catch (error) {
+      console.error('Error fetching families', error);
     }
   };
 
@@ -80,7 +91,7 @@ const ManagePrograms = () => {
 
   const handleCreateProgram = async () => {
     try {
-      if (editMode) {
+      if (editMode && selectedProgram) {
         await updateProgram(selectedProgram.ProgramID, newProgram);
         setNotification({
           open: true,
@@ -98,7 +109,7 @@ const ManagePrograms = () => {
       setOpen(false);
       fetchPrograms(); // Refresh the program list
     } catch (error) {
-      console.error('Error creating program', error);
+      console.error('Error creating/updating program', error);
       setNotification({
         open: true,
         message: 'Error creating/updating program',
@@ -174,14 +185,8 @@ const ManagePrograms = () => {
     });
   };
 
-  const handleViewFamilies = (program) => {
-    setSelectedProgram(program);
-    setViewFamiliesOpen(true);
-  };
-
   const handleCloseViewFamilies = () => {
     setViewFamiliesOpen(false);
-    setSelectedProgram(null);
   };
 
   return (
@@ -189,15 +194,28 @@ const ManagePrograms = () => {
       <Typography variant="h4" gutterBottom>
         Manage Programs
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<AddIcon />}
-        onClick={() => setOpen(true)}
-        sx={{ marginBottom: 2 }}
-      >
-        Add New Program
-      </Button>
+      <Grid container spacing={2} sx={{ marginBottom: 2 }}>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={() => setOpen(true)}
+          >
+            Add New Program
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<GroupIcon />}
+            onClick={() => setViewFamiliesOpen(true)}
+          >
+            View Families
+          </Button>
+        </Grid>
+      </Grid>
       <Dialog open={open} onClose={handleCloseDialog}>
         <DialogTitle>{editMode ? 'Edit Program' : 'Add New Program'}</DialogTitle>
         <DialogContent sx={{ marginTop: 2 }}>
@@ -288,9 +306,6 @@ const ManagePrograms = () => {
                   <IconButton color="secondary" onClick={() => handleDeleteProgram(program.ProgramID)}>
                     <DeleteIcon />
                   </IconButton>
-                  <IconButton color="primary" onClick={() => handleViewFamilies(program)}>
-                    <GroupIcon />
-                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
@@ -299,9 +314,44 @@ const ManagePrograms = () => {
       </TableContainer>
 
       <Dialog open={viewFamiliesOpen} onClose={handleCloseViewFamilies} maxWidth="md" fullWidth>
-        <DialogTitle>Families in Program</DialogTitle>
+        <DialogTitle>Families in Programs</DialogTitle>
         <DialogContent>
-          {selectedProgram && <ManageFamilies programId={selectedProgram.ProgramID} onClose={handleCloseViewFamilies} />}
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Family Head Name</TableCell>
+                  <TableCell>Address</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Number of Members</TableCell>
+                  <TableCell>Income Level</TableCell>
+                  <TableCell>Education Level</TableCell>
+                  <TableCell>Province</TableCell>
+                  <TableCell>District</TableCell>
+                  <TableCell>Sector</TableCell>
+                  <TableCell>Cell</TableCell>
+                  <TableCell>Village</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {families.map((family) => (
+                  <TableRow key={family.FamilyID}>
+                    <TableCell>{family.FamilyHeadName}</TableCell>
+                    <TableCell>{family.Address}</TableCell>
+                    <TableCell>{family.Status}</TableCell>
+                    <TableCell>{family.NumberOfMembers}</TableCell>
+                    <TableCell>{family.IncomeLevel}</TableCell>
+                    <TableCell>{family.EducationLevel}</TableCell>
+                    <TableCell>{family.Province}</TableCell>
+                    <TableCell>{family.District}</TableCell>
+                    <TableCell>{family.Sector}</TableCell>
+                    <TableCell>{family.Cell}</TableCell>
+                    <TableCell>{family.Village}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseViewFamilies} color="primary">

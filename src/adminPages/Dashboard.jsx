@@ -19,7 +19,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Label
 } from 'recharts';
 import { getDashboardStats } from '../services/DashboardService';
 
@@ -60,8 +61,12 @@ const AdminDashboard = () => {
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={dashboardStats.attendanceStats.attendanceByProgram}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="ProgramID" />
-                  <YAxis />
+                  <XAxis dataKey="ProgramID">
+                    <Label value="Program ID" offset={-5} position="insideBottom" />
+                  </XAxis>
+                  <YAxis>
+                    <Label value="Attendance Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
+                  </YAxis>
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="count" fill="#8884d8" />
@@ -81,8 +86,12 @@ const AdminDashboard = () => {
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={dashboardStats.contentStats.contentsByProgram}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="ProgramID" />
-                  <YAxis />
+                  <XAxis dataKey="ProgramID">
+                    <Label value="Program ID" offset={-5} position="insideBottom" />
+                  </XAxis>
+                  <YAxis>
+                    <Label value="Content Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
+                  </YAxis>
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="count" fill="#82ca9d" />
@@ -102,8 +111,12 @@ const AdminDashboard = () => {
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={dashboardStats.familyStats.familiesByProgram}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="ProgramID" />
-                  <YAxis />
+                  <XAxis dataKey="ProgramID">
+                    <Label value="Program ID" offset={-5} position="insideBottom" />
+                  </XAxis>
+                  <YAxis>
+                    <Label value="Family Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
+                  </YAxis>
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="count" fill="#ffc658" />
@@ -137,6 +150,7 @@ const AdminDashboard = () => {
                     ))}
                   </Pie>
                   <Tooltip />
+                  <Legend />
                 </PieChart>
               </ResponsiveContainer>
             </CardContent>
@@ -152,10 +166,17 @@ const AdminDashboard = () => {
               <Typography variant="h6">Active Programs: {dashboardStats.programStats.activePrograms}</Typography>
               <Divider sx={{ my: 2 }} />
               <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={[{ name: 'Active', value: dashboardStats.programStats.activePrograms }, { name: 'Inactive', value: dashboardStats.programStats.totalPrograms - dashboardStats.programStats.activePrograms }]}>
+                <BarChart data={[
+                  { name: 'Active', value: dashboardStats.programStats.activePrograms },
+                  { name: 'Inactive', value: dashboardStats.programStats.totalPrograms - dashboardStats.programStats.activePrograms }
+                ]}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
+                  <XAxis dataKey="name">
+                    <Label value="Program Status" offset={-5} position="insideBottom" />
+                  </XAxis>
+                  <YAxis>
+                    <Label value="Program Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
+                  </YAxis>
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="value" fill="#82ca9d" />

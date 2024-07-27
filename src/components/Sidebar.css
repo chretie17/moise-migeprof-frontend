@@ -84,3 +84,19 @@
   background-color: #f9f9f9;
   min-height: 100vh; /* Ensure it takes the full height of the viewport */
 }
+.sidebar .MuiDrawer-paper {
+  background-color: #f4f4f4; /* Light background color for the drawer */
+  border-right: 1px solid #ddd; /* Subtle border to separate the sidebar */
+}
+
+.sidebar .MuiListItem-root {
+  margin: 0.5rem 0; /* Spacing between items */
+}
+
+.sidebar .MuiListItemIcon-root {
+  min-width: 40px; /* Ensure icon alignment */
+}
+
+.sidebar .MuiListItemText-primary {
+  font-weight: bold; /* Bold text for list items */
+}

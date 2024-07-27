@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Grid, Paper, Typography, CircularProgress } from '@mui/material';
-import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Label } from 'recharts';
 import { getFieldAgentStats } from '../../services/DashboardService';
 import { styled } from '@mui/material/styles';
 
@@ -58,8 +58,12 @@ const FieldAgentDashboard = () => {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={data.programStats}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="ProgramName" />
-                <YAxis />
+                <XAxis dataKey="ProgramName">
+                  <Label value="Program Name" offset={-5} position="insideBottom" />
+                </XAxis>
+                <YAxis>
+                  <Label value="Attendance Count" angle={-90} position="insideLeft" style={{ textAnchor: 'middle' }} />
+                </YAxis>
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="attendanceCount" fill="#00b98e" />
@@ -89,6 +93,7 @@ const FieldAgentDashboard = () => {
                   ))}
                 </Pie>
                 <Tooltip />
+                <Legend />
               </PieChart>
             </ResponsiveContainer>
           </Paper>

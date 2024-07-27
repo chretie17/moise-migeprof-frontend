@@ -68,12 +68,13 @@ const ManageFeedback = () => {
               <TableCell>Recommend</TableCell>
               <TableCell>Additional Comments</TableCell>
               <TableCell>Rating</TableCell>
+              <TableCell>Total Attendance</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {feedbacks.map((feedback) => (
               <TableRow key={feedback.FeedbackID}>
-                <TableCell>{feedback.ProgramID}</TableCell>
+                <TableCell>{feedback.Program?.ProgramName}</TableCell>
                 <TableCell>{feedback.fullName}</TableCell>
                 <TableCell>{feedback.email}</TableCell>
                 <TableCell>{feedback.serviceName}</TableCell>
@@ -85,6 +86,7 @@ const ManageFeedback = () => {
                 <TableCell>
                   <Rating value={feedback.Rating} readOnly />
                 </TableCell>
+                <TableCell>{feedback.TotalAttendance}</TableCell>
               </TableRow>
             ))}
           </TableBody>

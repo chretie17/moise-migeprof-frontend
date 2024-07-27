@@ -13,6 +13,7 @@ import {
 import ReactStars from 'react-rating-stars-component';
 import { getAllPrograms } from '../services/Familyservice';
 import { submitFeedback } from '../services/FieldFeedbackservice';
+import { getProgramAttendanceForToday } from '../services/feedbackservice'; // Import the new service
 
 const FeedbackForm = () => {
   const [programs, setPrograms] = useState([]);
@@ -27,6 +28,7 @@ const FeedbackForm = () => {
     recommend: false,
     additionalComments: '',
     rating: 0, // Initialize rating field
+    totalAttendance: 0, // Initialize total attendance field
   });
   const [notification, setNotification] = useState({
     open: false,
@@ -36,7 +38,14 @@ const FeedbackForm = () => {
 
   useEffect(() => {
     fetchPrograms();
+    setCurrentDate();
   }, []);
+
+  useEffect(() => {
+    if (feedbackData.programId) {
+      fetchProgramAttendance(feedbackData.programId);
+    }
+  }, [feedbackData.programId]);
 
   const fetchPrograms = async () => {
     try {
@@ -45,6 +54,26 @@ const FeedbackForm = () => {
     } catch (error) {
       console.error('Error fetching programs', error);
     }
+  };
+
+  const fetchProgramAttendance = async (programId) => {
+    try {
+      const attendanceCount = await getProgramAttendanceForToday(programId);
+      setFeedbackData((prevData) => ({
+        ...prevData,
+        totalAttendance: attendanceCount,
+      }));
+    } catch (error) {
+      console.error('Error fetching program attendance', error);
+    }
+  };
+
+  const setCurrentDate = () => {
+    const currentDate = new Date().toISOString().split('T')[0];
+    setFeedbackData((prevData) => ({
+      ...prevData,
+      sessionDate: currentDate,
+    }));
   };
 
   const handleInputChange = (e) => {
@@ -81,6 +110,7 @@ const FeedbackForm = () => {
         recommend: false,
         additionalComments: '',
         rating: 0,
+        totalAttendance: 0,
       });
     } catch (error) {
       console.error('Error submitting feedback', error);
@@ -190,6 +220,14 @@ const FeedbackForm = () => {
         value={feedbackData.uncertainties}
         onChange={handleInputChange}
         required
+      />
+      <TextField
+        margin="normal"
+        fullWidth
+        label="Total Attendance Today"
+        name="totalAttendance"
+        value={feedbackData.totalAttendance}
+        InputProps={{ readOnly: true }}
       />
       <FormControlLabel
         control={

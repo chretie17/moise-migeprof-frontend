@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Typography,
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Table,
   TableBody,
   TableCell,
@@ -9,31 +14,18 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
   Snackbar,
   Alert,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
+  Typography,
+  Grid,
+  IconButton,
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { getFamiliesByProgram, updateFamily, deleteFamily } from '../services/Familyservice';
+import AddIcon from '@mui/icons-material/Add';
+import { getFamilies, registerFamily, deleteFamily } from '../services/Familyservice';
 
 const ManageFamilies = ({ programId, onClose }) => {
   const [families, setFamilies] = useState([]);
-  const [selectedFamily, setSelectedFamily] = useState(null);
-  const [familyData, setFamilyData] = useState({
-    Address: '',
-    Status: '',
-    FamilyHeadName: '',
-    NumberOfMembers: '',
-    IncomeLevel: '',
-    EducationLevel: '',
-  });
   const [openDialog, setOpenDialog] = useState(false);
   const [notification, setNotification] = useState({
     open: false,
@@ -41,43 +33,52 @@ const ManageFamilies = ({ programId, onClose }) => {
     severity: 'success',
   });
 
+  const [familyData, setFamilyData] = useState({
+    FamilyHeadName: '',
+    Address: '',
+    Status: '',
+    NumberOfMembers: '',
+    IncomeLevel: '',
+    EducationLevel: '',
+    Province: '',
+    District: '',
+    Sector: '',
+    Cell: '',
+    Village: '',
+  });
+
   useEffect(() => {
     fetchFamilies();
-  }, []);
+  }, [programId]);
 
   const fetchFamilies = async () => {
     try {
-      const families = await getFamiliesByProgram(programId);
+      const families = await getFamilies();
       setFamilies(families);
     } catch (error) {
       console.error('Error fetching families', error);
     }
   };
 
-  const handleOpenDialog = (family) => {
-    setSelectedFamily(family);
+  const handleOpenDialog = () => {
     setFamilyData({
-      Address: family.Address,
-      Status: family.Status,
-      FamilyHeadName: family.FamilyHeadName,
-      NumberOfMembers: family.NumberOfMembers,
-      IncomeLevel: family.IncomeLevel,
-      EducationLevel: family.EducationLevel,
+      FamilyHeadName: '',
+      Address: '',
+      Status: '',
+      NumberOfMembers: '',
+      IncomeLevel: '',
+      EducationLevel: '',
+      Province: '',
+      District: '',
+      Sector: '',
+      Cell: '',
+      Village: '',
     });
     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setSelectedFamily(null);
-    setFamilyData({
-      Address: '',
-      Status: '',
-      FamilyHeadName: '',
-      NumberOfMembers: '',
-      IncomeLevel: '',
-      EducationLevel: '',
-    });
   };
 
   const handleInputChange = (e) => {
@@ -88,21 +89,21 @@ const ManageFamilies = ({ programId, onClose }) => {
     });
   };
 
-  const handleUpdateFamily = async () => {
+  const handleSaveFamily = async () => {
     try {
-      await updateFamily(selectedFamily.FamilyID, familyData);
+      await registerFamily({ ...familyData, ProgramID: programId });
       setNotification({
         open: true,
-        message: 'Family updated successfully',
+        message: 'Family created successfully',
         severity: 'success',
       });
       fetchFamilies();
       handleCloseDialog();
     } catch (error) {
-      console.error('Error updating family', error);
+      console.error('Error saving family', error);
       setNotification({
         open: true,
-        message: 'Error updating family',
+        message: 'Error saving family',
         severity: 'error',
       });
     }
@@ -136,30 +137,45 @@ const ManageFamilies = ({ programId, onClose }) => {
   };
 
   return (
-    <Box>
-      <Typography variant="h6" gutterBottom>
+    <Box sx={{ padding: 3 }}>
+      <Typography variant="h4" gutterBottom>
         Families in Program
       </Typography>
       <TableContainer component={Paper}>
-        <Table>
+        <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
+              <TableCell>Program Name</TableCell>
               <TableCell>Family Head Name</TableCell>
               <TableCell>Address</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Number of Members</TableCell>
+              <TableCell>Income Level</TableCell>
+              <TableCell>Education Level</TableCell>
+              <TableCell>Province</TableCell>
+              <TableCell>District</TableCell>
+              <TableCell>Sector</TableCell>
+              <TableCell>Cell</TableCell>
+              <TableCell>Village</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {families.map((family) => (
               <TableRow key={family.FamilyID}>
+                <TableCell>{family.Programs}</TableCell>
                 <TableCell>{family.FamilyHeadName}</TableCell>
                 <TableCell>{family.Address}</TableCell>
                 <TableCell>{family.Status}</TableCell>
+                <TableCell>{family.NumberOfMembers}</TableCell>
+                <TableCell>{family.IncomeLevel}</TableCell>
+                <TableCell>{family.EducationLevel}</TableCell>
+                <TableCell>{family.Province}</TableCell>
+                <TableCell>{family.District}</TableCell>
+                <TableCell>{family.Sector}</TableCell>
+                <TableCell>{family.Cell}</TableCell>
+                <TableCell>{family.Village}</TableCell>
                 <TableCell>
-                  <IconButton color="primary" onClick={() => handleOpenDialog(family)}>
-                    <EditIcon />
-                  </IconButton>
                   <IconButton color="secondary" onClick={() => handleDeleteFamily(family.FamilyID)}>
                     <DeleteIcon />
                   </IconButton>
@@ -171,69 +187,138 @@ const ManageFamilies = ({ programId, onClose }) => {
       </TableContainer>
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Edit Family</DialogTitle>
+        <DialogTitle>Add New Family</DialogTitle>
         <DialogContent>
-          <TextField
-            margin="dense"
-            name="FamilyHeadName"
-            label="Family Head Name"
-            type="text"
-            fullWidth
-            value={familyData.FamilyHeadName}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="Address"
-            label="Address"
-            type="text"
-            fullWidth
-            value={familyData.Address}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="Status"
-            label="Status"
-            type="text"
-            fullWidth
-            value={familyData.Status}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="NumberOfMembers"
-            label="Number of Members"
-            type="number"
-            fullWidth
-            value={familyData.NumberOfMembers}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="IncomeLevel"
-            label="Income Level"
-            type="text"
-            fullWidth
-            value={familyData.IncomeLevel}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="EducationLevel"
-            label="Education Level"
-            type="text"
-            fullWidth
-            value={familyData.EducationLevel}
-            onChange={handleInputChange}
-          />
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="FamilyHeadName"
+                label="Family Head Name"
+                type="text"
+                fullWidth
+                value={familyData.FamilyHeadName}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="Address"
+                label="Address"
+                type="text"
+                fullWidth
+                value={familyData.Address}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="Status"
+                label="Status"
+                type="text"
+                fullWidth
+                value={familyData.Status}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="NumberOfMembers"
+                label="Number of Members"
+                type="number"
+                fullWidth
+                value={familyData.NumberOfMembers}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="IncomeLevel"
+                label="Income Level"
+                type="text"
+                fullWidth
+                value={familyData.IncomeLevel}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="EducationLevel"
+                label="Education Level"
+                type="text"
+                fullWidth
+                value={familyData.EducationLevel}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="Province"
+                label="Province"
+                type="text"
+                fullWidth
+                value={familyData.Province}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="District"
+                label="District"
+                type="text"
+                fullWidth
+                value={familyData.District}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="Sector"
+                label="Sector"
+                type="text"
+                fullWidth
+                value={familyData.Sector}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="Cell"
+                label="Cell"
+                type="text"
+                fullWidth
+                value={familyData.Cell}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                margin="dense"
+                name="Village"
+                label="Village"
+                type="text"
+                fullWidth
+                value={familyData.Village}
+                onChange={handleInputChange}
+              />
+            </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleUpdateFamily} color="primary">
-            Update
+          <Button onClick={handleSaveFamily} color="primary">
+            Add
           </Button>
         </DialogActions>
       </Dialog>
@@ -243,14 +328,10 @@ const ManageFamilies = ({ programId, onClose }) => {
         autoHideDuration={6000}
         onClose={handleCloseNotification}
       >
-        <Alert onClose={handleCloseNotification} severity={notification.severity}>
+        <Alert onClose={handleCloseNotification} severity={notification.severity} sx={{ width: '100%' }}>
           {notification.message}
         </Alert>
       </Snackbar>
-
-      <Button variant="contained" color="primary" onClick={onClose} sx={{ marginTop: 2 }}>
-        Close
-      </Button>
     </Box>
   );
 };

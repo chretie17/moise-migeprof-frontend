@@ -95,7 +95,11 @@ const Login = () => {
       }
     } catch (err) {
       console.error('Error during login:', err); // Log the error for debugging
-      setError('Invalid credentials');
+      if (err.response && err.response.status === 403) {
+        setError('User is disabled. Please contact support.');
+      } else {
+        setError('Invalid credentials');
+      }
     }
   };
 

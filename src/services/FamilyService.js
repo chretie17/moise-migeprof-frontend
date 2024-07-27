@@ -16,6 +16,11 @@ export const getFamilies = async () => {
   const response = await axios.get(`${API_URL}/families`);
   return response.data;
 };
+export const getAllFamilies = async () => {
+  const response = await axios.get(`${API_URL}/families/all`);
+  return response.data;
+};
+
 
 export const updateFamily = async (familyID, familyData) => {
   const response = await axios.put(`${API_URL}/families/update/${familyID}`, familyData);

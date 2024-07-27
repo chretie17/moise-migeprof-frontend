@@ -16,10 +16,15 @@ import {
   Alert,
   IconButton,
   Divider,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { getAllPrograms, registerFamily, updateFamily, deleteFamily, getFamilies } from '../services/Familyservice';
 import CloseIcon from '@mui/icons-material/Close';
 import GroupIcon from '@mui/icons-material/Group';
+import { Provinces, Districts, Sectors, Cells, Villages } from 'rwanda';
 
 const RegisterFamilies = () => {
   const [programs, setPrograms] = useState([]);
@@ -42,11 +47,23 @@ const RegisterFamilies = () => {
     NumberOfMembers: '',
     IncomeLevel: '',
     EducationLevel: '',
+    Province: '',
+    District: '',
+    Sector: '',
+    Cell: '',
+    Village: '',
   });
+
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [sectors, setSectors] = useState([]);
+  const [cells, setCells] = useState([]);
+  const [villages, setVillages] = useState([]);
 
   useEffect(() => {
     fetchPrograms();
     fetchFamilies();
+    loadProvinces();
   }, []);
 
   const fetchPrograms = async () => {
@@ -77,6 +94,66 @@ const RegisterFamilies = () => {
     }
   };
 
+  const loadProvinces = () => {
+    const provinces = Provinces();
+    setProvinces(provinces);
+  };
+
+  const loadDistricts = (province) => {
+    const districts = Districts(province);
+    setDistricts(districts || []);
+    setSectors([]);  // Clear sectors when province changes
+    setCells([]);    // Clear cells when province changes
+    setVillages([]); // Clear villages when province changes
+  };
+
+  const loadSectors = (province, district) => {
+    const sectors = Sectors(province, district);
+    setSectors(sectors || []);
+    setCells([]);    // Clear cells when district changes
+    setVillages([]); // Clear villages when district changes
+  };
+
+  const loadCells = (province, district, sector) => {
+    const cells = Cells(province, district, sector);
+    setCells(cells || []);
+    setVillages([]); // Clear villages when sector changes
+  };
+
+  const loadVillages = (province, district, sector, cell) => {
+    const villages = Villages(province, district, sector, cell);
+    setVillages(villages || []);
+  };
+
+  const handleProvinceChange = (e) => {
+    const province = e.target.value;
+    setFamilyData({ ...familyData, Province: province, District: '', Sector: '', Cell: '', Village: '' });
+    loadDistricts(province);
+  };
+
+  const handleDistrictChange = (e) => {
+    const district = e.target.value;
+    setFamilyData({ ...familyData, District: district, Sector: '', Cell: '', Village: '' });
+    loadSectors(familyData.Province, district);
+  };
+
+  const handleSectorChange = (e) => {
+    const sector = e.target.value;
+    setFamilyData({ ...familyData, Sector: sector, Cell: '', Village: '' });
+    loadCells(familyData.Province, familyData.District, sector);
+  };
+
+  const handleCellChange = (e) => {
+    const cell = e.target.value;
+    setFamilyData({ ...familyData, Cell: cell, Village: '' });
+    loadVillages(familyData.Province, familyData.District, familyData.Sector, cell);
+  };
+
+  const handleVillageChange = (e) => {
+    const village = e.target.value;
+    setFamilyData({ ...familyData, Village: village });
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFamilyData({
@@ -96,7 +173,16 @@ const RegisterFamilies = () => {
         NumberOfMembers: family.NumberOfMembers,
         IncomeLevel: family.IncomeLevel,
         EducationLevel: family.EducationLevel,
+        Province: family.Province,
+        District: family.District,
+        Sector: family.Sector,
+        Cell: family.Cell,
+        Village: family.Village,
       });
+      loadDistricts(family.Province);
+      loadSectors(family.Province, family.District);
+      loadCells(family.Province, family.District, family.Sector);
+      loadVillages(family.Province, family.District, family.Sector, family.Cell);
     }
     setOpenDialog(true);
   };
@@ -112,14 +198,19 @@ const RegisterFamilies = () => {
       NumberOfMembers: '',
       IncomeLevel: '',
       EducationLevel: '',
+      Province: '',
+      District: '',
+      Sector: '',
+      Cell: '',
+      Village: '',
     });
   };
 
   const handleRegisterFamily = async () => {
-    if (!familyData.Address || !familyData.Status) {
+    if (!familyData.Address || !familyData.Status || !familyData.Province || !familyData.District || !familyData.Sector || !familyData.Cell || !familyData.Village) {
       setNotification({
         open: true,
-        message: 'Address and Status are required',
+        message: 'All fields are required',
         severity: 'error',
       });
       return;
@@ -145,10 +236,10 @@ const RegisterFamilies = () => {
   };
 
   const handleUpdateFamily = async () => {
-    if (!familyData.Address || !familyData.Status) {
+    if (!familyData.Address || !familyData.Status || !familyData.Province || !familyData.District || !familyData.Sector || !familyData.Cell || !familyData.Village) {
       setNotification({
         open: true,
-        message: 'Address and Status are required',
+        message: 'All fields are required',
         severity: 'error',
       });
       return;
@@ -387,21 +478,23 @@ const RegisterFamilies = () => {
           <TextField
             margin="dense"
             name="Address"
-            label="Address"
+            label="Contact Number"
             type="text"
             fullWidth
             value={familyData.Address}
             onChange={handleInputChange}
           />
-          <TextField
-            margin="dense"
-            name="Status"
-            label="Status"
-            type="text"
-            fullWidth
-            value={familyData.Status}
-            onChange={handleInputChange}
-          />
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Status</InputLabel>
+            <Select
+              name="Status"
+              value={familyData.Status}
+              onChange={handleInputChange}
+            >
+              <MenuItem value="Divorced">Divorced</MenuItem>
+              <MenuItem value="Married">Married</MenuItem>
+            </Select>
+          </FormControl>
           <TextField
             margin="dense"
             name="NumberOfMembers"
@@ -411,24 +504,109 @@ const RegisterFamilies = () => {
             value={familyData.NumberOfMembers}
             onChange={handleInputChange}
           />
-          <TextField
-            margin="dense"
-            name="IncomeLevel"
-            label="Income Level"
-            type="text"
-            fullWidth
-            value={familyData.IncomeLevel}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            name="EducationLevel"
-            label="Education Level"
-            type="text"
-            fullWidth
-            value={familyData.EducationLevel}
-            onChange={handleInputChange}
-          />
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Income Level</InputLabel>
+            <Select
+              name="IncomeLevel"
+              value={familyData.IncomeLevel}
+              onChange={handleInputChange}
+            >
+              <MenuItem value="Low">Low</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="High">High</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Education Level</InputLabel>
+            <Select
+              name="EducationLevel"
+              value={familyData.EducationLevel}
+              onChange={handleInputChange}
+            >
+              <MenuItem value="None">None</MenuItem>
+              <MenuItem value="Primary">Primary</MenuItem>
+              <MenuItem value="Secondary">Secondary</MenuItem>
+              <MenuItem value="University">University</MenuItem>
+              <MenuItem value="Vocational Studies">Vocational Studies</MenuItem>
+
+            </Select>
+          </FormControl>
+          <Divider sx={{ my: 2 }} />
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Province</InputLabel>
+            <Select
+              name="Province"
+              value={familyData.Province}
+              onChange={handleProvinceChange}
+            >
+              <MenuItem value="" disabled>Select Province</MenuItem>
+              {provinces.map((province) => (
+                <MenuItem key={province} value={province}>
+                  {province}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="dense" disabled={!familyData.Province}>
+            <InputLabel>District</InputLabel>
+            <Select
+              name="District"
+              value={familyData.District}
+              onChange={handleDistrictChange}
+            >
+              <MenuItem value="" disabled>Select District</MenuItem>
+              {districts.map((district) => (
+                <MenuItem key={district} value={district}>
+                  {district}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="dense" disabled={!familyData.District}>
+            <InputLabel>Sector</InputLabel>
+            <Select
+              name="Sector"
+              value={familyData.Sector}
+              onChange={handleSectorChange}
+            >
+              <MenuItem value="" disabled>Select Sector</MenuItem>
+              {sectors.map((sector) => (
+                <MenuItem key={sector} value={sector}>
+                  {sector}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="dense" disabled={!familyData.Sector}>
+            <InputLabel>Cell</InputLabel>
+            <Select
+              name="Cell"
+              value={familyData.Cell}
+              onChange={handleCellChange}
+            >
+              <MenuItem value="" disabled>Select Cell</MenuItem>
+              {cells.map((cell) => (
+                <MenuItem key={cell} value={cell}>
+                  {cell}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth margin="dense" disabled={!familyData.Cell}>
+            <InputLabel>Village</InputLabel>
+            <Select
+              name="Village"
+              value={familyData.Village}
+              onChange={handleVillageChange}
+            >
+              <MenuItem value="" disabled>Select Village</MenuItem>
+              {villages.map((village) => (
+                <MenuItem key={village} value={village}>
+                  {village}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="primary">

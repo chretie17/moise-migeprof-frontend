@@ -13,3 +13,9 @@ export const submitFeedback = async (feedbackData) => {
   const response = await api.post('/feedback', feedbackData);
   return response.data;
 };
+
+
+export const getProgramAttendanceForToday = async (programId) => {
+  const response = await api.get(`/feedback/today-attendance/${programId}`);
+  return response.data.count;
+};

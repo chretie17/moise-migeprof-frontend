@@ -10,6 +10,7 @@ import ManageRegistrations from './adminPages/ManageRegistrations';
 import ViewReports from './adminPages/ViewReports';
 import AccessMaterials from './fieldAgentPages/AccessMaterials';
 import RegisterFamilies from './fieldAgentPages/RegisterFamilies';
+import ManageFamilies from './adminPages/ManageFamilies';
 import ManageAttendance from './adminPages/Attendance';
 import ManageFeedback from './adminPages/AllFeedbacks';
 import SubmitFeedback from './fieldAgentPages/Feedback';
@@ -19,13 +20,16 @@ import PrivateRoute from './components/Auth/PrivateRoute';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { SearchProvider } from './context/SearchContext';
 
 const App = () => {
   return (
     <AuthProvider>
-      <Router>
-        <Main />
-      </Router>
+      <SearchProvider>
+        <Router>
+          <Main />
+        </Router>
+      </SearchProvider>
     </AuthProvider>
   );
 };
@@ -42,7 +46,7 @@ const Main = () => {
           <Navbar />
         </>
       )}
-      <div className="main-content">
+      <div className="main-content" style={{ marginLeft: isAuthenticated ? 240 : 0, marginTop: isAuthenticated ? 64 : 0 }}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Navigate to="/login" />} />
@@ -101,6 +105,14 @@ const Main = () => {
             element={
               <PrivateRoute>
                 <ManageAttendance />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/manage-families"
+            element={
+              <PrivateRoute>
+                <ManageFamilies />
               </PrivateRoute>
             }
           />

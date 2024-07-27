@@ -13,7 +13,8 @@ import {
   Avatar,
   CardHeader,
 } from '@mui/material';
-import { getAllPrograms, getFamilies } from '../services/Familyservice';
+import moment from 'moment-timezone';
+import { getAllPrograms, getAllFamilies } from '../services/Familyservice';
 import { addOrUpdateAttendance, getAttendances } from '../services/AttendanceService';
 
 const ManageAttendance = () => {
@@ -53,7 +54,7 @@ const ManageAttendance = () => {
 
   const fetchFamilies = async () => {
     try {
-      const families = await getFamilies();
+      const families = await getAllFamilies();
       setFamilies(families);
       setLoadingFamilies(false);
     } catch (error) {
@@ -83,7 +84,8 @@ const ManageAttendance = () => {
   const handleAttendanceChange = async (status, programID, familyID) => {
     try {
       const userID = 2; // Hardcoded user ID
-      await addOrUpdateAttendance({ ProgramID: programID, FamilyID: familyID, Status: status, UserID: userID });
+      const dateInKigaliTime = moment().tz('Africa/Kigali').format('YYYY-MM-DD HH:mm:ss');
+      await addOrUpdateAttendance({ ProgramID: programID, FamilyID: familyID, Status: status, UserID: userID, Date: dateInKigaliTime });
       fetchAttendances(); // Refresh attendance data
       setNotification({
         open: true,
@@ -162,7 +164,7 @@ const ManageAttendance = () => {
           ) : (
             <Grid container spacing={3}>
               {families
-                .filter((family) => family.Programs.some((program) => program.ProgramID === selectedProgram))
+                .filter((family) => Array.isArray(family.Programs) && family.Programs.some((program) => program.ProgramID === selectedProgram))
                 .map((family) => (
                   <Grid item xs={12} sm={6} md={4} key={family.FamilyID}>
                     <Card sx={{ maxWidth: 345, margin: 'auto' }}>
